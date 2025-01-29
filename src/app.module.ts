@@ -3,9 +3,15 @@ import { ConfigModule } from "@nestjs/config";
 import { NestIAMModule } from "nest-iam";
 import { PermissionModule } from "./permission/permission.module";
 import { ResourceModule } from "./resource/resource.module";
+import { RoleModule } from "./role/role.module";
 import { ScopeModule } from "./scope/scope.module";
 
-export const appModules = [ScopeModule, ResourceModule, PermissionModule];
+export const appModules = [
+  ScopeModule,
+  ResourceModule,
+  PermissionModule,
+  RoleModule,
+];
 
 @Module({
   imports: [
