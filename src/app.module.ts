@@ -1,10 +1,11 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { NestIAMModule } from "nest-iam";
+import { PermissionModule } from "./permission/permission.module";
+import { ResourceModule } from "./resource/resource.module";
 import { ScopeModule } from "./scope/scope.module";
-import { ResourceModule } from './resource/resource.module';
 
-export const appModules = [ScopeModule];
+export const appModules = [ScopeModule, ResourceModule, PermissionModule];
 
 @Module({
   imports: [
@@ -18,7 +19,6 @@ export const appModules = [ScopeModule];
       url: "postgresql://wailwinphyo:wailwinphyo@localhost:5432/postgres",
     }),
     ...appModules,
-    ResourceModule,
   ],
 })
 export class AppModule {}
