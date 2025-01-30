@@ -6,7 +6,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from "@nestjs/common";
+import { ApiQuery } from "@nestjs/swagger";
 import { NestIamCoreService } from "nest-iam";
 import {
   CreateRoleDto,
@@ -24,8 +26,23 @@ export class RoleController {
   }
 
   @Get()
-  findAll() {
-    return this.iamService.getRoles();
+  @ApiQuery({
+    name: "uuid",
+    type: String,
+    required: false,
+  })
+  findAll(@Query() query: { uuid?: string }) {
+    return this.iamService.getRoles(query.uuid);
+  }
+
+  @Get(":id")
+  @ApiQuery({
+    name: "uuid",
+    type: String,
+    required: false,
+  })
+  findOne(@Param("id") id: string, @Query() query: { uuid?: string }) {
+    return this.iamService.getRoleById(id, query.uuid);
   }
 
   @Patch(":id")
@@ -46,7 +63,7 @@ export class RoleController {
     return this.iamService.addPermissionToRole(addPermissionToRoleDto);
   }
 
-  @Delete(":id/permission/:rid")
+  @Delete(":id/permission/:pid")
   deleteRelatedPermission(@Param("id") id: string, @Param("pid") pid: string) {
     const deleteRelatedPermissionDto = new PermissionRoleDto();
     deleteRelatedPermissionDto.role_id = id;

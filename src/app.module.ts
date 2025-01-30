@@ -16,13 +16,9 @@ export const appModules = [
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    // NestIAMModule.forRoot({
-    //   provider: "mongodb",
-    //   url: "mongodb://root:example@localhost:27022/socialmetrica?authSource=admin&replicaSet=rs0&directConnection=true",
-    // }),
     NestIAMModule.forRoot({
-      provider: "postgresql",
-      url: "postgresql://wailwinphyo:wailwinphyo@localhost:5432/postgres",
+      provider: process.env["NESTIAM_PROVIDER"]! as any,
+      url: process.env["NESTIAM_URL"]!,
     }),
     ...appModules,
   ],
