@@ -5,6 +5,7 @@ import { PermissionModule } from "./permission/permission.module";
 import { ResourceModule } from "./resource/resource.module";
 import { RoleModule } from "./role/role.module";
 import { ScopeModule } from "./scope/scope.module";
+import { TokenModule } from "./token/token.module";
 import { UserModule } from "./user/user.module";
 
 export const appModules = [
@@ -13,6 +14,7 @@ export const appModules = [
   PermissionModule,
   RoleModule,
   UserModule,
+  TokenModule,
 ];
 
 @Module({
@@ -21,6 +23,10 @@ export const appModules = [
     NestIAMModule.forRoot({
       provider: process.env["NESTIAM_PROVIDER"]! as any,
       url: process.env["NESTIAM_URL"]!,
+      tokenExpiredTime: 60,
+      refreshTokenExpiredTime: 80,
+      timeUnit: "m",
+      secret: "secret",
     }),
     ...appModules,
   ],
