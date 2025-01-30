@@ -5,12 +5,14 @@ import { PermissionModule } from "./permission/permission.module";
 import { ResourceModule } from "./resource/resource.module";
 import { RoleModule } from "./role/role.module";
 import { ScopeModule } from "./scope/scope.module";
+import { UserModule } from "./user/user.module";
 
 export const appModules = [
   ScopeModule,
   ResourceModule,
   PermissionModule,
   RoleModule,
+  UserModule,
 ];
 
 @Module({

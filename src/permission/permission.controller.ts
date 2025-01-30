@@ -41,15 +41,12 @@ export class PermissionController {
     return this.iamService.deletePermission(id);
   }
 
-  @Post(":id/related-permission/:rid")
-  relatedPermissionAdd(@Param("id") id: string, @Param("rid") rid: string) {
-    const createRelatedPermissionDto = new RelatedPermissionDto();
-    createRelatedPermissionDto.parent_id = id;
-    createRelatedPermissionDto.child_id = rid;
-    return this.iamService.addRelatedPermission(createRelatedPermissionDto);
+  @Post("related-permissions")
+  relatedPermissionAdd(@Body() body: RelatedPermissionDto) {
+    return this.iamService.addRelatedPermission(body);
   }
 
-  @Delete(":id/related-permission/:rid")
+  @Delete(":id/related-permissions/:rid")
   relatedPremissionRemove(@Param("id") id: string, @Param("rid") rid: string) {
     const createRelatedPermissionDto = new RelatedPermissionDto();
     createRelatedPermissionDto.parent_id = id;

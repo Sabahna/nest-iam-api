@@ -55,15 +55,12 @@ export class RoleController {
     return this.iamService.deleteRole(id);
   }
 
-  @Post(":id/permission/:pid")
-  addPermissionToRole(@Param("id") id: string, @Param("pid") pid: string) {
-    const addPermissionToRoleDto = new PermissionRoleDto();
-    addPermissionToRoleDto.role_id = id;
-    addPermissionToRoleDto.permission_id = pid;
-    return this.iamService.addPermissionToRole(addPermissionToRoleDto);
+  @Post("permissions")
+  addPermissionToRole(@Body() body: PermissionRoleDto) {
+    return this.iamService.addPermissionToRole(body);
   }
 
-  @Delete(":id/permission/:pid")
+  @Delete(":id/permissions/:pid")
   deleteRelatedPermission(@Param("id") id: string, @Param("pid") pid: string) {
     const deleteRelatedPermissionDto = new PermissionRoleDto();
     deleteRelatedPermissionDto.role_id = id;
