@@ -9,7 +9,7 @@ import {
   Query,
 } from "@nestjs/common";
 import { ApiQuery } from "@nestjs/swagger";
-import { NestIamCoreService } from "nest-iam";
+import { NestIamCoreService, Public } from "nest-iam";
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -17,6 +17,7 @@ import {
 } from "nest-iam/dist/type/user";
 
 @Controller("user")
+@Public(true)
 export class UserController {
   constructor(private readonly iamService: NestIamCoreService) {}
 

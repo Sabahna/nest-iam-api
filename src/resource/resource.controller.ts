@@ -7,13 +7,14 @@ import {
   Patch,
   Post,
 } from "@nestjs/common";
-import { NestIamCoreService } from "nest-iam";
+import { NestIamCoreService, Public } from "nest-iam";
 import {
   CreateResourceDto,
   UpdateResourceDto,
 } from "nest-iam/dist/type/resource";
 
 @Controller("resource")
+@Public(true)
 export class ResourceController {
   constructor(private readonly iamService: NestIamCoreService) {}
 

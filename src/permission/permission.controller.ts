@@ -7,7 +7,7 @@ import {
   Patch,
   Post,
 } from "@nestjs/common";
-import { NestIamCoreService } from "nest-iam";
+import { NestIamCoreService, Public } from "nest-iam";
 import {
   CreatePermissionDto,
   RelatedPermissionDto,
@@ -15,6 +15,7 @@ import {
 } from "nest-iam/dist/type/permission";
 
 @Controller("permission")
+@Public(true)
 export class PermissionController {
   constructor(private readonly iamService: NestIamCoreService) {}
 

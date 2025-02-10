@@ -1,8 +1,9 @@
 import { Body, Controller, Post } from "@nestjs/common";
-import { NestIamCoreService } from "nest-iam";
+import { NestIamCoreService, Public } from "nest-iam";
 import { CreateSessionDto, UpdateSessionDto } from "nest-iam/dist/type/session";
 
 @Controller("token")
+@Public(true)
 export class TokenController {
   constructor(private readonly iamService: NestIamCoreService) {}
 
