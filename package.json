@@ -26,7 +26,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.0.3",
     "cookie-parser": "^1.4.7",
-    "nest-iam": "/Users/tensor_lab/projects/nest/nest-iam",
+    "nest-iam": "github:Sabahna/nest-iam",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
