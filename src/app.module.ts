@@ -7,6 +7,7 @@ import { RoleModule } from "./role/role.module";
 import { ScopeModule } from "./scope/scope.module";
 import { TokenModule } from "./token/token.module";
 import { UserModule } from "./user/user.module";
+import { ProviderType } from "../../nest-iam/lib";
 
 export const appModules = [
   ScopeModule,
@@ -21,7 +22,7 @@ export const appModules = [
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     NestIAMModule.forRoot({
-      provider: process.env["NESTIAM_PROVIDER"]! as any,
+      provider: process.env["NESTIAM_PROVIDER"]! as ProviderType,
       url: process.env["NESTIAM_URL"]!,
       tokenExpiredTime: 60,
       refreshTokenExpiredTime: 80,

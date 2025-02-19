@@ -42,7 +42,7 @@ export class RoleController {
     type: String,
     required: false,
   })
-  findOne(@Param("id") id: string, @Query() query: { uuid?: string }) {
+  findOne(@Query() query: { uuid?: string }, @Param("id") id?: string) {
     return this.iamService.getRoleById(id, query.uuid);
   }
 
