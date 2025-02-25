@@ -1,13 +1,12 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { NestIAMModule } from "nest-iam";
+import { NestIAMModule, ProviderType } from "nest-iam";
 import { PermissionModule } from "./permission/permission.module";
 import { ResourceModule } from "./resource/resource.module";
 import { RoleModule } from "./role/role.module";
 import { ScopeModule } from "./scope/scope.module";
 import { TokenModule } from "./token/token.module";
 import { UserModule } from "./user/user.module";
-import { ProviderType } from "../../nest-iam/lib";
 
 export const appModules = [
   ScopeModule,
