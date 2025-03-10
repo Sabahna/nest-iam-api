@@ -7,8 +7,12 @@ import {
   Patch,
   Post,
 } from "@nestjs/common";
-import { NestIamCoreService, Public } from "nest-iam";
-import { CreateScopeDto, UpdateScopeDto } from "nest-iam/dist/type/scope";
+import {
+  CreateScopeDto,
+  NestIamCoreService,
+  Public,
+  UpdateScopeDto,
+} from "nest-iam";
 
 @Controller("scope")
 @Public(true)

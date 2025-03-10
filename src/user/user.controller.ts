@@ -9,12 +9,13 @@ import {
   Query,
 } from "@nestjs/common";
 import { ApiQuery } from "@nestjs/swagger";
-import { NestIamCoreService, Public } from "nest-iam";
 import {
   CreateUserDto,
+  NestIamCoreService,
+  Public,
   UpdateUserDto,
   UserRoleDto,
-} from "nest-iam/dist/type/user";
+} from "nest-iam";
 
 @Controller("user")
 @Public(true)

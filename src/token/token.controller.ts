@@ -1,6 +1,10 @@
 import { Body, Controller, Post } from "@nestjs/common";
-import { NestIamCoreService, Public } from "nest-iam";
-import { CreateSessionDto, UpdateSessionDto } from "nest-iam/dist/type/session";
+import {
+  CreateSessionDto,
+  NestIamCoreService,
+  Public,
+  UpdateSessionDto,
+} from "nest-iam";
 
 @Controller("token")
 @Public(true)

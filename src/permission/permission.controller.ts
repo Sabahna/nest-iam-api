@@ -7,12 +7,13 @@ import {
   Patch,
   Post,
 } from "@nestjs/common";
-import { NestIamCoreService, Public } from "nest-iam";
 import {
   CreatePermissionDto,
+  NestIamCoreService,
+  Public,
   RelatedPermissionDto,
   UpdatePermissionDto,
-} from "nest-iam/dist/type/permission";
+} from "nest-iam";
 
 @Controller("permission")
 @Public(true)

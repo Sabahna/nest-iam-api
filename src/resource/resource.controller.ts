@@ -7,11 +7,12 @@ import {
   Patch,
   Post,
 } from "@nestjs/common";
-import { NestIamCoreService, Public } from "nest-iam";
 import {
   CreateResourceDto,
+  NestIamCoreService,
+  Public,
   UpdateResourceDto,
-} from "nest-iam/dist/type/resource";
+} from "nest-iam";
 
 @Controller("resource")
 @Public(true)
