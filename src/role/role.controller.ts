@@ -8,7 +8,8 @@ import {
   Post,
   Query,
 } from "@nestjs/common";
-import { ApiQuery } from "@nestjs/swagger";
+import { OmitType } from "@nestjs/mapped-types";
+import { ApiProperty, ApiQuery } from "@nestjs/swagger";
 import {
   CreateRoleDto,
   NestIamCoreService,
@@ -17,14 +18,26 @@ import {
   UpdateRoleDto,
 } from "nest-iam";
 
+export class CreationRoleDto extends OmitType(CreateRoleDto, [
+  "options",
+] as const) {
+  @ApiProperty({ type: Number, default: 1 })
+  isOrgLvl: number;
+}
+
 @Controller("role")
 @Public(true)
 export class RoleController {
   constructor(private readonly iamService: NestIamCoreService) {}
 
   @Post()
-  create(@Body() createRoleDto: CreateRoleDto) {
-    return this.iamService.createRole(createRoleDto);
+  create(@Body() createRoleDto: CreationRoleDto) {
+    const data = {
+      ...createRoleDto,
+      options: { isOrgLvl: createRoleDto.isOrgLvl },
+    };
+
+    return this.iamService.createRole(data);
   }
 
   @Get()
