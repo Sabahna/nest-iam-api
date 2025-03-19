@@ -25,7 +25,7 @@ export default async function applicationSwaggerConfig(
   app: NestExpressApplication,
 ) {
   // const url = await app.getUrl();
-  const url = "http://192.168.1.143:3000";
+  const url = "http://192.168.1.240:3000";
 
   /**
    * Swagger for APIs

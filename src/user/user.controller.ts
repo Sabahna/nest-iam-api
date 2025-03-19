@@ -11,13 +11,14 @@ import {
 import { ApiQuery } from "@nestjs/swagger";
 import {
   CreateUserDto,
+  DeleteUserRoleDto,
   NestIamCoreService,
   Public,
   UpdateUserDto,
   UserRoleDto,
 } from "nest-iam";
 
-@Controller("user")
+@Controller("users")
 @Public(true)
 export class UserController {
   constructor(private readonly iamService: NestIamCoreService) {}
@@ -28,8 +29,9 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
-    return this.iamService.getUsers();
+  @ApiQuery({ name: "uuid", type: String, required: false })
+  findAll(@Query() query: { uuid?: string }) {
+    return this.iamService.getUsers(query.uuid);
   }
 
   @Get(":id")
@@ -63,13 +65,17 @@ export class UserController {
     type: String,
     required: false,
   })
+  @ApiQuery({
+    name: "role_id",
+    type: String,
+    required: false,
+  })
   removeRoleFromUser(
     @Param("id") id: string,
-    @Param("rid") rid: string,
-    @Query() query: { uuid?: string },
+    @Query() query: { uuid?: string; role_id?: string },
   ) {
-    const userRole = new UserRoleDto();
-    userRole.role_id = rid;
+    const userRole = new DeleteUserRoleDto();
+    userRole.role_id = query.role_id;
     userRole.user_id = id;
     if (query.uuid) {
       userRole.uuid = query.uuid;
