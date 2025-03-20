@@ -8,9 +8,9 @@ REMOTE_PATH="$4"
 # Build the project
 yarn run build
 
-# Copy environment and package files
-cp .env.production dist/.env
+# Copy package files
 cp package.json dist/package.json
+cp ecosystem.config.js dist/ecosystem.config.js
 
 # Use rsync to copy files (fixed quoting issue)
 rsync -av -e "ssh -i $PRIVATE_KEY -o StrictHostKeyChecking=no" ./dist/. "$USERNAME@$HOST:$REMOTE_PATH"
@@ -26,7 +26,7 @@ ssh -o StrictHostKeyChecking=no -i "$PRIVATE_KEY" "$USERNAME@$HOST" << EOF
         echo "No changes in package.json. Skipping npm install."
     fi
     echo "Installation Done"
-    pm2 reload /home/ubuntu/ecosystem.json
+    pm2 reload ./ecosystem.config.js
     echo "Successfully restarted the admin api"
 EOF
 
