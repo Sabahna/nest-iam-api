@@ -1,44 +1,37 @@
+import { Controller } from "@nestjs/common";
+import { GrpcMethod, Payload } from "@nestjs/microservices";
+import { NestIamCoreService, Public } from "nest-iam";
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from "@nestjs/common";
-import {
-  CreateResourceDto,
-  NestIamCoreService,
-  Public,
-  UpdateResourceDto,
-} from "nest-iam";
+  IAM_RESOURCE_SERVICE_NAME,
+  type CreateResourceRequest,
+  type DeleteResourceRequest,
+  type UpdateResourceRequest,
+} from "../protobuf/iam/resource.pb";
 
-@Controller("resource")
+@Controller()
 @Public(true)
 export class ResourceController {
   constructor(private readonly iamService: NestIamCoreService) {}
 
-  @Post()
-  create(@Body() createResourceDto: CreateResourceDto) {
-    return this.iamService.createResource(createResourceDto);
+  @GrpcMethod(IAM_RESOURCE_SERVICE_NAME, "createResource")
+  createResource(@Payload() payload: CreateResourceRequest) {
+    return this.iamService.createResource(payload);
   }
 
-  @Get()
-  findAll() {
-    return this.iamService.getResources();
+  @GrpcMethod(IAM_RESOURCE_SERVICE_NAME, "getResources")
+  async getResources() {
+    const items = await this.iamService.getResources();
+    return { items };
   }
 
-  @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updateResourceDto: UpdateResourceDto,
-  ) {
+  @GrpcMethod(IAM_RESOURCE_SERVICE_NAME, "updateResource")
+  updateResource(@Payload() payload: UpdateResourceRequest) {
+    const { id, ...updateResourceDto } = payload;
     return this.iamService.updateResource(id, updateResourceDto);
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.iamService.deleteResource(id);
+  @GrpcMethod(IAM_RESOURCE_SERVICE_NAME, "deleteResource")
+  deleteResource(@Payload() payload: DeleteResourceRequest) {
+    return this.iamService.deleteResource(payload.id);
   }
 }

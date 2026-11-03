@@ -7,7 +7,6 @@ import { RoleModule } from "./role/role.module";
 import { ScopeModule } from "./scope/scope.module";
 import { TokenModule } from "./token/token.module";
 import { UserModule } from "./user/user.module";
-import { MetabaseModule } from "./metabase/metabase.module";
 
 export const appModules = [
   ScopeModule,
@@ -16,7 +15,6 @@ export const appModules = [
   RoleModule,
   UserModule,
   TokenModule,
-  MetabaseModule,
 ];
 
 @Module({

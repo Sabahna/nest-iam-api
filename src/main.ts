@@ -1,24 +1,34 @@
 import { NestFactory } from "@nestjs/core";
-import { NestExpressApplication } from "@nestjs/platform-express";
-import cookieParser from "cookie-parser";
-import { NestIAMExceptionFilter } from "nest-iam";
-import applicationSwaggerConfig from "./app.api.swagger";
+import { GrpcOptions, Transport } from "@nestjs/microservices";
 import { AppModule } from "./app.module";
+import { protoRoot, serverProtos } from "./utils/protos";
 
 async function application() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.use(cookieParser());
-  app.useGlobalFilters(new NestIAMExceptionFilter());
-  // Enable CORS
-  app.enableCors({
-    origin: "*", // Allow all origins (for debugging)
-    methods: "*",
+  const url = process.env.IAM_GRPC_URL ?? `127.0.0.1:${process.env.PORT ?? 5010}`;
+  const grpcPackages = [...new Set(serverProtos.map((proto) => proto.packageName))];
+  const grpcProtoPaths = serverProtos.map((proto) => proto.path);
+
+  const app = await NestFactory.create(AppModule);
+
+  app.connectMicroservice<GrpcOptions>({
+    transport: Transport.GRPC,
+    options: {
+      url,
+      package: grpcPackages,
+      protoPath: grpcProtoPaths,
+      loader: {
+        includeDirs: [protoRoot],
+        longs: Number,
+        defaults: true,
+        arrays: true,
+      },
+    },
   });
 
-  await applicationSwaggerConfig(app);
-  await app.listen(process.env.PORT ?? 3000, "0.0.0.0");
+  await app.init();
+  await app.startAllMicroservices();
 
-  console.log("App is running at " + (await app.getUrl()));
+  console.log(`IAM gRPC service is running on ${url}`);
 }
 
-application();
+void application();
