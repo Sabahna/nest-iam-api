@@ -1,84 +1,63 @@
+import { Controller } from "@nestjs/common";
+import { GrpcMethod, Payload } from "@nestjs/microservices";
+import { CreateRoleDto, NestIamCoreService, Public } from "nest-iam";
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from "@nestjs/common";
-import { OmitType } from "@nestjs/mapped-types";
-import { ApiPropertyOptional, ApiQuery } from "@nestjs/swagger";
-import {
-  CreateRoleDto,
-  NestIamCoreService,
-  PermissionRoleDto,
-  Public,
-  UpdateRoleDto,
-} from "nest-iam";
+  IAM_ROLE_SERVICE_NAME,
+  type CreateRoleRequest,
+  type DeleteRoleRequest,
+  type GetRoleByIdRequest,
+  type GetRolesRequest,
+  type PermissionRoleRequest,
+  type UpdateRoleRequest,
+} from "../protobuf/iam/role.pb";
 
-export class CreationRoleDto extends OmitType(CreateRoleDto, [
-  "options",
-] as const) {
-  @ApiPropertyOptional({ type: Number, default: 1 })
-  isOrgLvl?: number;
-}
-
-@Controller("role")
+@Controller()
 @Public(true)
 export class RoleController {
   constructor(private readonly iamService: NestIamCoreService) {}
 
-  @Post()
-  create(@Body() createRoleDto: CreationRoleDto) {
-    if (createRoleDto.isOrgLvl) {
-      createRoleDto["options"] = { isOrgLvl: createRoleDto.isOrgLvl };
-    }
+  @GrpcMethod(IAM_ROLE_SERVICE_NAME, "createRole")
+  createRole(@Payload() payload: CreateRoleRequest) {
+    const { isOrgLvl, ...rest } = payload;
+    const createRoleDto: CreateRoleDto = {
+      ...rest,
+      options: isOrgLvl ? { isOrgLvl } : undefined,
+    };
 
     return this.iamService.createRole(createRoleDto);
   }
 
-  @Get()
-  @ApiQuery({
-    name: "uuid",
-    type: String,
-    required: false,
-  })
-  findAll(@Query() query: { uuid?: string }) {
-    return this.iamService.getRoles(query.uuid);
+  @GrpcMethod(IAM_ROLE_SERVICE_NAME, "getRoles")
+  async getRoles(@Payload() payload: GetRolesRequest) {
+    const items = await this.iamService.getRoles(payload?.uuid);
+    return { items };
   }
 
-  @Get(":id")
-  @ApiQuery({
-    name: "uuid",
-    type: String,
-    required: false,
-  })
-  findOne(@Query() query: { uuid?: string }, @Param("id") id: string) {
-    return this.iamService.getRoleById(id, query.uuid);
+  @GrpcMethod(IAM_ROLE_SERVICE_NAME, "getRoleById")
+  getRoleById(@Payload() payload: GetRoleByIdRequest) {
+    return this.iamService.getRoleById(payload.id, payload.uuid);
   }
 
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateRoleDto: UpdateRoleDto) {
+  @GrpcMethod(IAM_ROLE_SERVICE_NAME, "updateRole")
+  updateRole(@Payload() payload: UpdateRoleRequest) {
+    const { id, ...updateRoleDto } = payload;
     return this.iamService.updateRole(id, updateRoleDto);
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.iamService.deleteRole(id);
+  @GrpcMethod(IAM_ROLE_SERVICE_NAME, "deleteRole")
+  deleteRole(@Payload() payload: DeleteRoleRequest) {
+    return this.iamService.deleteRole(payload.id);
   }
 
-  @Post("permissions")
-  addPermissionToRole(@Body() body: PermissionRoleDto) {
-    return this.iamService.addPermissionToRole(body);
+  @GrpcMethod(IAM_ROLE_SERVICE_NAME, "addPermissionToRole")
+  async addPermissionToRole(@Payload() payload: PermissionRoleRequest) {
+    await this.iamService.addPermissionToRole(payload);
+    return {};
   }
 
-  @Delete(":id/permissions/:pid")
-  deleteRelatedPermission(@Param("id") id: string, @Param("pid") pid: string) {
-    const deleteRelatedPermissionDto = new PermissionRoleDto();
-    deleteRelatedPermissionDto.role_id = id;
-    deleteRelatedPermissionDto.permission_id = pid;
-    return this.iamService.deletePermissionFromRole(deleteRelatedPermissionDto);
+  @GrpcMethod(IAM_ROLE_SERVICE_NAME, "deletePermissionFromRole")
+  async deletePermissionFromRole(@Payload() payload: PermissionRoleRequest) {
+    await this.iamService.deletePermissionFromRole(payload);
+    return {};
   }
 }

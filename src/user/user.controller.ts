@@ -1,86 +1,63 @@
+import { Controller } from "@nestjs/common";
+import { GrpcMethod, Payload } from "@nestjs/microservices";
+import { DeleteUserRoleDto, NestIamCoreService, Public } from "nest-iam";
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from "@nestjs/common";
-import { ApiQuery } from "@nestjs/swagger";
-import {
-  CreateUserDto,
-  DeleteUserRoleDto,
-  NestIamCoreService,
-  Public,
-  UpdateUserDto,
-  UserRoleDto,
-} from "nest-iam";
+  IAM_USER_SERVICE_NAME,
+  type CreateUserRequest,
+  type DeleteUserRequest,
+  type DeleteUserRoleRequest,
+  type GetUserRoleRequest,
+  type GetUsersRequest,
+  type UpdateUserRequest,
+  type UserRoleRequest,
+} from "../protobuf/iam/user.pb";
 
-@Controller("users")
+@Controller()
 @Public(true)
 export class UserController {
   constructor(private readonly iamService: NestIamCoreService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.iamService.createUser(createUserDto);
+  @GrpcMethod(IAM_USER_SERVICE_NAME, "createUser")
+  createUser(@Payload() payload: CreateUserRequest) {
+    return this.iamService.createUser(payload);
   }
 
-  @Get()
-  @ApiQuery({ name: "uuid", type: String, required: false })
-  findAll(@Query() query: { uuid?: string }) {
-    return this.iamService.getUsers(query.uuid);
+  @GrpcMethod(IAM_USER_SERVICE_NAME, "getUsers")
+  async getUsers(@Payload() payload: GetUsersRequest) {
+    const items = await this.iamService.getUsers(payload?.uuid);
+    return { items };
   }
 
-  @Get(":id")
-  @ApiQuery({
-    name: "uuid",
-    type: String,
-    required: false,
-  })
-  findOne(@Param("id") id: string, @Query() query: { uuid?: string }) {
-    return this.iamService.getUserRole(id, query.uuid);
+  @GrpcMethod(IAM_USER_SERVICE_NAME, "getUserRole")
+  getUserRole(@Payload() payload: GetUserRoleRequest) {
+    return this.iamService.getUserRole(payload.id, payload.uuid);
   }
 
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
+  @GrpcMethod(IAM_USER_SERVICE_NAME, "updateUser")
+  updateUser(@Payload() payload: UpdateUserRequest) {
+    const { id, ...updateUserDto } = payload;
     return this.iamService.updateUser(id, updateUserDto);
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.iamService.deleteUser(id);
+  @GrpcMethod(IAM_USER_SERVICE_NAME, "deleteUser")
+  deleteUser(@Payload() payload: DeleteUserRequest) {
+    return this.iamService.deleteUser(payload.id);
   }
 
-  @Post("roles")
-  addRoleFromUser(@Body() body: UserRoleDto) {
-    return this.iamService.addRoleToUser(body);
+  @GrpcMethod(IAM_USER_SERVICE_NAME, "addRoleToUser")
+  async addRoleToUser(@Payload() payload: UserRoleRequest) {
+    await this.iamService.addRoleToUser(payload);
+    return {};
   }
 
-  @Delete(":id/roles/:rid")
-  @ApiQuery({
-    name: "uuid",
-    type: String,
-    required: false,
-  })
-  @ApiQuery({
-    name: "role_id",
-    type: String,
-    required: false,
-  })
-  removeRoleFromUser(
-    @Param("id") id: string,
-    @Query() query: { uuid?: string; role_id?: string },
-  ) {
+  @GrpcMethod(IAM_USER_SERVICE_NAME, "deleteRoleFromUser")
+  async deleteRoleFromUser(@Payload() payload: DeleteUserRoleRequest) {
     const userRole = new DeleteUserRoleDto();
-    userRole.role_id = query.role_id;
-    userRole.user_id = id;
-    if (query.uuid) {
-      userRole.uuid = query.uuid;
-    }
+    userRole.user_id = payload.user_id;
+    userRole.role_id = payload.role_id;
+    userRole.uuid = payload.uuid;
 
-    return this.iamService.deleteRoleFromUser(userRole);
+    await this.iamService.deleteRoleFromUser(userRole);
+    return {};
   }
 }
