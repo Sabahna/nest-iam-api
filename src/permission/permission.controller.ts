@@ -1,58 +1,50 @@
+import { Controller } from "@nestjs/common";
+import { GrpcMethod, Payload } from "@nestjs/microservices";
+import { NestIamCoreService, Public } from "nest-iam";
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from "@nestjs/common";
-import {
-  CreatePermissionDto,
-  NestIamCoreService,
-  Public,
-  RelatedPermissionDto,
-  UpdatePermissionDto,
-} from "nest-iam";
+  IAM_PERMISSION_SERVICE_NAME,
+  type CreatePermissionRequest,
+  type DeletePermissionRequest,
+  type RelatedPermissionRequest,
+  type UpdatePermissionRequest,
+} from "../protobuf/iam/permission.pb";
 
-@Controller("permission")
+@Controller()
 @Public(true)
 export class PermissionController {
   constructor(private readonly iamService: NestIamCoreService) {}
 
-  @Post()
-  create(@Body() createPermissionDto: CreatePermissionDto) {
-    return this.iamService.createPermission(createPermissionDto);
+  @GrpcMethod(IAM_PERMISSION_SERVICE_NAME, "createPermission")
+  createPermission(@Payload() payload: CreatePermissionRequest) {
+    return this.iamService.createPermission(payload);
   }
 
-  @Get()
-  findAll() {
-    return this.iamService.getPermissions();
+  @GrpcMethod(IAM_PERMISSION_SERVICE_NAME, "getPermissions")
+  async getPermissions() {
+    const items = await this.iamService.getPermissions();
+    return { items };
   }
 
-  @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updatePermissionDto: UpdatePermissionDto,
-  ) {
+  @GrpcMethod(IAM_PERMISSION_SERVICE_NAME, "updatePermission")
+  updatePermission(@Payload() payload: UpdatePermissionRequest) {
+    const { id, ...updatePermissionDto } = payload;
     return this.iamService.updatePermission(id, updatePermissionDto);
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.iamService.deletePermission(id);
+  @GrpcMethod(IAM_PERMISSION_SERVICE_NAME, "deletePermission")
+  deletePermission(@Payload() payload: DeletePermissionRequest) {
+    return this.iamService.deletePermission(payload.id);
   }
 
-  @Post("related-permissions")
-  relatedPermissionAdd(@Body() body: RelatedPermissionDto) {
-    return this.iamService.addRelatedPermission(body);
+  @GrpcMethod(IAM_PERMISSION_SERVICE_NAME, "addRelatedPermission")
+  async addRelatedPermission(@Payload() payload: RelatedPermissionRequest) {
+    await this.iamService.addRelatedPermission(payload);
+    return {};
   }
 
-  @Delete(":id/related-permissions/:rid")
-  relatedPremissionRemove(@Param("id") id: string, @Param("rid") rid: string) {
-    const createRelatedPermissionDto = new RelatedPermissionDto();
-    createRelatedPermissionDto.parent_id = id;
-    createRelatedPermissionDto.child_id = rid;
-    return this.iamService.deleteRelatedPermission(createRelatedPermissionDto);
+  @GrpcMethod(IAM_PERMISSION_SERVICE_NAME, "deleteRelatedPermission")
+  async deleteRelatedPermission(@Payload() payload: RelatedPermissionRequest) {
+    await this.iamService.deleteRelatedPermission(payload);
+    return {};
   }
 }

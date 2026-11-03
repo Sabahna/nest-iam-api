@@ -1,23 +1,24 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Controller } from "@nestjs/common";
+import { GrpcMethod, Payload } from "@nestjs/microservices";
+import { NestIamCoreService, Public } from "nest-iam";
 import {
-  CreateSessionDto,
-  NestIamCoreService,
-  Public,
-  UpdateSessionDto,
-} from "nest-iam";
+  IAM_TOKEN_SERVICE_NAME,
+  type RefreshTokenRequest,
+  type RequestTokenRequest,
+} from "../protobuf/iam/token.pb";
 
-@Controller("token")
+@Controller()
 @Public(true)
 export class TokenController {
   constructor(private readonly iamService: NestIamCoreService) {}
 
-  @Post()
-  requestToken(@Body() createTokenDto: CreateSessionDto) {
-    return this.iamService.requestToken(createTokenDto);
+  @GrpcMethod(IAM_TOKEN_SERVICE_NAME, "requestToken")
+  requestToken(@Payload() payload: RequestTokenRequest) {
+    return this.iamService.requestToken(payload);
   }
 
-  @Post("refresh")
-  refreshToken(@Body() body: UpdateSessionDto) {
-    return this.iamService.refreshToken(body);
+  @GrpcMethod(IAM_TOKEN_SERVICE_NAME, "refreshToken")
+  refreshToken(@Payload() payload: RefreshTokenRequest) {
+    return this.iamService.refreshToken(payload);
   }
 }

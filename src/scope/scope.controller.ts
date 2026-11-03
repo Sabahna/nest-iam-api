@@ -1,41 +1,37 @@
+import { Controller } from "@nestjs/common";
+import { GrpcMethod, Payload } from "@nestjs/microservices";
+import { NestIamCoreService, Public } from "nest-iam";
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from "@nestjs/common";
-import {
-  CreateScopeDto,
-  NestIamCoreService,
-  Public,
-  UpdateScopeDto,
-} from "nest-iam";
+  IAM_SCOPE_SERVICE_NAME,
+  type CreateScopeRequest,
+  type DeleteScopeRequest,
+  type UpdateScopeRequest,
+} from "../protobuf/iam/scope.pb";
 
-@Controller("scope")
+@Controller()
 @Public(true)
 export class ScopeController {
   constructor(private readonly iamService: NestIamCoreService) {}
 
-  @Post()
-  create(@Body() createScopeDto: CreateScopeDto) {
-    return this.iamService.createScope(createScopeDto);
+  @GrpcMethod(IAM_SCOPE_SERVICE_NAME, "createScope")
+  createScope(@Payload() payload: CreateScopeRequest) {
+    return this.iamService.createScope(payload);
   }
 
-  @Get()
-  findAll() {
-    return this.iamService.getScopes();
+  @GrpcMethod(IAM_SCOPE_SERVICE_NAME, "getScopes")
+  async getScopes() {
+    const items = await this.iamService.getScopes();
+    return { items };
   }
 
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateScopeDto: UpdateScopeDto) {
+  @GrpcMethod(IAM_SCOPE_SERVICE_NAME, "updateScope")
+  updateScope(@Payload() payload: UpdateScopeRequest) {
+    const { id, ...updateScopeDto } = payload;
     return this.iamService.updateScope(id, updateScopeDto);
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.iamService.deleteScope(id);
+  @GrpcMethod(IAM_SCOPE_SERVICE_NAME, "deleteScope")
+  deleteScope(@Payload() payload: DeleteScopeRequest) {
+    return this.iamService.deleteScope(payload.id);
   }
 }
